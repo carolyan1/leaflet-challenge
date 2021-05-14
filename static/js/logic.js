@@ -3,7 +3,7 @@
 // Creating map object
 var myMap = L.map("mapid", { 
     center: [40.7128, -74.0060],
-    zoom: 10
+    zoom: 2
   });
   
 // Adding tile layer to the map
@@ -20,27 +20,28 @@ var thislayer = L.tileLayer("https://api.mapbox.com/styles/v1/{id}/tiles/{z}/{x}
 //load data
 var url = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_week.geojson"
 
-var dmarkers = []
+// var dmarkers = []
 //need to get coordinates, magnitude, size, dept (third coordinate for each earthquake)
 //Your data markers should reflect the magnitude of the earthquake by their size and and depth of the earth quake by color.
 
-d3.json(url), function(data) {
+d3.json(url).then(function(data) {
+    console.log(data);
     for (i=0; i<data.features.length; i++){
             var coordinates = data.features[i].geometry.coordinates;
-            var mag = data.feratures[i].properties.mag;
+            var mag = data.features[i].properties.mag;
             var dept = data.features[i].geometry.coordinates[2];
-            var place = data.feratures[i].properties.place;
+            var place = data.features[i].properties.place;
             // data.forEach(d=>dmarkers.push(L.marker(coordinates).bindPopup("<h1>"+place+"</h1>")))
 
             // Conditionals for color
             var colorOpa = "";
-            if (dept > 8) {
+            if (dept > 300) {
                 colorOpa = 1;
             }
-            else if (dept > 6) {
+            else if (dept >75) {
                 colorOpa = 0.75;
             }
-            else if (dept > 4) {
+            else if (dept > 50) {
                 colorOpa = 0.5;
             }
             else {
@@ -50,12 +51,12 @@ d3.json(url), function(data) {
             //Create a circle and pass in the coordinates
             //Your data markers should reflect the magnitude of the earthquake by their size and and depth of the earth quake by color.
             //and earthquakes with greater depth should appear darker in color. 
-            L.circle([coordinates[0],coordinates[1]], {
-                radius:mag,
-                fillcolor: "green",
-                fillOpaciity: colorOpa
-            }).bindPopup("<h3>" + place + "</h3>").addTo(myMap)
-        }};
+            L.circle([coordinates[1],coordinates[0]], {
+                radius:mag*50000,
+                fillOpacity: colorOpa,
+                fill: true
+            }).bindPopup("<h3>" + place + "</h3>" + dept).addTo(myMap)
+        }})
  
 
 //Create a map using leaflet that plots all of the earthquakes from the data set based on their longitude and latitude
